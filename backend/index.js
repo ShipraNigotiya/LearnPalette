@@ -10,6 +10,7 @@ const feedbackRouter = require('./Routers/feedbackRouter');
 const contactRouter = require('./Routers/contactRouter');
 
 const cors = require('cors');
+const videoModel = require('./Models/videoModel');
 
 // initialize express app
 const app = express();
@@ -27,6 +28,7 @@ app.use('/class',classRouter)
 app.use('/util',utilRouter)
 app.use('/lecture',lectureRouter)
 app.use('/whiteboard',whiteboardRouter)
+app.use('/video',videoModel)
 app.use('/feedback', feedbackRouter)
 app.use('/contact', contactRouter)
 
