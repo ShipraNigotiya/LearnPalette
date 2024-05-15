@@ -8,9 +8,9 @@ const lectureRouter = require('./Routers/lectureRouter');
 const whiteboardRouter = require('./Routers/whiteboardRouter');
 const feedbackRouter = require('./Routers/feedbackRouter');
 const contactRouter = require('./Routers/contactRouter');
+const videoRouter = require('./Routers/videoRouter');
 
 const cors = require('cors');
-const videoModel = require('./Models/videoModel');
 
 // initialize express app
 const app = express();
@@ -28,11 +28,12 @@ app.use('/class',classRouter)
 app.use('/util',utilRouter)
 app.use('/lecture',lectureRouter)
 app.use('/whiteboard',whiteboardRouter)
-app.use('/video',videoModel)
+app.use('/video',videoRouter)
 app.use('/feedback', feedbackRouter)
 app.use('/contact', contactRouter)
 
 
+app.use(express.static('./static/uploads'));
 
 app.get('/', (req,res) => {
     res.send('rest123');

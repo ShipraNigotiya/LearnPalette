@@ -1,18 +1,23 @@
 'use client';
 import useTeacherContext from '@/app/context/TeacherContext';
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
+import toast from 'react-hot-toast';
 
 const Managevideo = () => {
 
+    const screenRecording = useRef(null);
     const [videoList, setvideoList] = useState([]);
+    const [Recorder, setRecorder] = useState(null);
+    const [displayMedia, setDisplayMedia] = useState(null);
     const [currentTeacher, setCurrentTeacher] = useState(JSON.parse(sessionStorage.getItem('teacher')));
+    
     const fetchvideosData = () => {
-        fetch('http://localhost:5000/video/getall',{
+        fetch('http://localhost:5000/video/getall', {
             headers: {
                 "Content-Type": "application/json",
                 "x-auth-token": currentTeacher.token,
-              },
-            })
+            },
+        })
             .then((response) => {
                 return response.json();
             })
@@ -31,92 +36,163 @@ const Managevideo = () => {
 
     const deleteFunc = async (id) => {
         console.log(id);
-         const res = await fetch ('http://localhost:5000/video/delete/' + id ,{
+        const res = await fetch('http://localhost:5000/video/delete/' + id, {
             method: "DELETE"
-         })
-         if (res.status ===200){
+        })
+        if (res.status === 200) {
             fetchvideosData();
-         }
+        }
     }
 
+    const generateTitle = () => {
+        return 'SCREEN_RECORDING_' + new Date().toISOString().replace(/:/g, '_');
+    }
+
+    const saveToDatabase = (filename) => {
+        const data = {
+            title: generateTitle(),
+            file: filename
+        }
+        fetch(`http://localhost:5000/video/add`, {
+            method: "POST",
+            body: JSON.stringify(data),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then((res) => {
+            if (res.status === 200) {
+                console.log("file uploaded");
+                toast.success('File Uploaded!!');
+            }
+        });
+    }
+
+    const updateBlobMetadata = (blob, newType, newName) => {
+        // Create a new Blob from the old Blob's data with the new type
+        const newBlob = new Blob([blob], { type: newType });
+        // Create a new File from the new Blob with the new name
+        const newFile = new File([newBlob], newName, { type: newType });
+        return newFile;
+    };
+
+    const generateRandomName = () => {
+        const timestamp = Date.now();
+        return `screen_recording_${timestamp}.webm`;
+    };
+
+    const uploadFile = (file) => {
+        const fd = new FormData();
+        fd.append("myfile", file);
+        // fd.append("originalname", file.originalname); // Add originalname to the FormData
+        fetch(`http://localhost:5000/util/uploadfile`, {
+            method: "POST",
+            body: fd,
+        }).then((res) => {
+            if (res.status === 200) {
+                console.log("file uploaded");
+                toast.success('File Uploaded!!');
+                // setSelFile(file.name)
+                // updatePodcast({ published: true, record: file.name });
+            }
+        });
+    };
+
+
+
+    const startScreenRecording = async () => {
+        const stream = await navigator.mediaDevices.getDisplayMedia({
+            audio: true, video: true
+        });
+        const recorder = new MediaRecorder(stream);
+        setRecorder(recorder);
+        setDisplayMedia(stream.getVideoTracks()[0]);
+        const screenRecordingChunks = [];
+        recorder.ondataavailable = (e) => {
+            if (e.data.size > 0) {
+                screenRecordingChunks.push(e.data);
+            }
+        }
+        recorder.onstop = () => {
+            //onstop event of media recorder  
+            const blob = new Blob(screenRecordingChunks,
+                { type: 'video/webm' });
+            const url = URL.createObjectURL(blob);
+            screenRecording.current.src = url;
+            if (displayMedia) {
+                displayMedia.stop();
+            }
+        }
+        //Start the recording. 
+        recorder.start();
+    }
+
+    const saveRecording = () => {
+        fetch(screenRecording.current.src)
+            .then(response => response.blob())
+            .then(blob => {
+                const file = updateBlobMetadata(blob, 'video/webm', generateRandomName());
+                uploadFile(file);
+                saveToDatabase(file.name);
+                // const url = URL.createObjectURL(blob);
+                // const a = document.createElement('a');
+                // document.body.appendChild(a);
+                // a.style = 'display: none';
+                // a.href = url;
+                // a.download = 'test.webm';
+                // a.click();
+                // window.URL.revokeObjectURL(url);
+            })
+            .catch(error => console.error(error));
+    }
 
     const displayvideos = () => {
         return videoList.map(video => (
-            <tr className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
-                <th
-                    scope="row"
-                    className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-                >
-                    {video.fname}
-                </th>
-                <td className="px-6 py-4">{video.lname}</td>
-                <td className="px-6 py-4">{video.email}</td>
-                <td className="px-6 py-4">{video.password}</td>
-                <td className="px-6 py-4">
-                    <a
-                        href="#"
-                        className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-                    >
-                        Edit
-                    </a>
-                </td>
-                <td className="px-6 py-4">
-                    <button
-                        href="#"
-                        className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-                        onClick={() => {deleteFunc(video._id)}}
-                    >
-                        Delete
-                    </button>
-                </td>
-            </tr>
+            <div className='col-span-3'>
+                <video src={"http://localhost:5000/" + video.file} controls></video>
+            </div>
         ))
     }
 
     return (
         <div>
-<div className="w-full mt-5 container  mx-auto">
-            <div className="w-full flex items-center justify-between">
-              <a
-                className=" text-center ml-80 flex items-center text-indigo-400 no-underline hover:no-underline font-bold text-4xl lg:text-6xl justify-center "
-                href="#"
-              >
-                {/* Learn */}
-                <span className="  bg-clip-text text-transparent bg-gradient-to-r from-green-400 via-pink-500 to-purple-500  text-center">
-         videos
-                </span>
-              </a>
+            <div className="w-full mt-5 container  mx-auto">
+                <div className="w-full flex items-center justify-between">
+                    <a
+                        className=" text-center ml-80 flex items-center text-indigo-400 no-underline hover:no-underline font-bold text-4xl lg:text-6xl justify-center "
+                        href="#"
+                    >
+                        {/* Learn */}
+                        <span className="  bg-clip-text text-transparent bg-gradient-to-r from-green-400 via-pink-500 to-purple-500  text-center">
+                            videos
+                        </span>
+                    </a>
+                </div>
             </div>
-          </div>
 
-            <div className="relative overflow-x-auto shadow-md sm:rounded-lg  p-8 lg:mx-2 md:mx-2">
-                <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                    <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                        <tr>
-                            <th scope="col" className="px-6 py-3">
-                               First name
-                            </th>
-                            <th scope="col" className="px-6 py-3">
-                                Last name
-                            </th>
-                            <th scope="col" className="px-6 py-3">
-                                Email
-                            </th>
-                            <th scope="col" className="px-6 py-3">
-                                Password
-                            </th>
-                            <th scope="col" className="px-6 py-3">
-                                update
-                            </th>
-                            <th scope="col" className="px-6 py-3">
-                                Delete
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {displayvideos()}
-                    </tbody>
-                </table>
+            <div className='flex gap-5'>
+                <button
+                    onClick={startScreenRecording}
+                    className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-5 ml-5'
+                >Record New Video</button>
+                {
+                    Recorder &&
+                    <button
+                        onClick={() => { saveRecording() }}
+                        className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-5 ml-5'
+                    >Save Recording</button>
+                }
+
+            </div>
+
+            {
+                Recorder &&
+                <video ref={screenRecording} height={300} width={600} controls />
+            }
+
+            <div className='grid grid-cols-12 gap-5'>
+                {
+                    displayvideos()
+                }
             </div>
 
         </div>
