@@ -95,7 +95,7 @@ const createclass = () => {
                       <small class="text-pink-500">{createclassForm.errors.name}</small>
                     }
                     <input
-                      className="w-full px-8 py-4 mb-4 rounded-lg font-medium bg-lavender-100 border border--200 placeholder-lavender-500 text-sm focus:outline-none focus:border-lavender -400 focus:bg-black"
+                      className="w-full px-8 py-4 mb-4 rounded-lg text-white font-medium bg-lavender-100 border border--200 placeholder-lavender-500 text-sm focus:outline-none focus:border-lavender -400 focus:bg-black"
                       type="text"
                       placeholder=" Name"
                       id="name"
@@ -113,7 +113,7 @@ const createclass = () => {
                       <small class="text-pink-500">{createclassForm.errors.description}</small>
                     }
                     <input
-                      className="w-full px-8 py-4 mb-4 rounded-lg font-medium bg-lavender-100 border border-lavender-200 placeholder-lavender-500 text-sm focus:outline-none focus:border-lavender-400 focus:bg-black"
+                      className="w-full px-8 py-4 mb-4 text-white rounded-lg font-medium bg-lavender-100 border border-lavender-200 placeholder-lavender-500 text-sm focus:outline-none focus:border-lavender-400 focus:bg-black"
                       type="text"
                       placeholder=" Description"
                       id="description"
@@ -131,7 +131,7 @@ const createclass = () => {
                       <small class="text-pink-500">{createclassForm.errors.tags}</small>
                     }
                     <input
-                      className="w-full px-8 py-4 rounded-lg font-medium bg-lavender-100 border border-lavender-200 placeholder-lavender-500 text-sm focus:outline-none focus:border-lavender-400 focus:bg-black"
+                      className="w-full px-8 py-4 rounded-lg text-white font-medium bg-lavender-100 border border-lavender-200 placeholder-lavender-500 text-sm focus:outline-none focus:border-lavender-400 focus:bg-black"
                       type="tags"
                       placeholder="Tags"
                       id="tags"
