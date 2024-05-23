@@ -182,6 +182,8 @@ const AddLecture = ({close, classId}) => {
                                     </svg>
                                     Delete
                                 </button>
+                         
+                          
                             </div>
                         </form>
                     </div>

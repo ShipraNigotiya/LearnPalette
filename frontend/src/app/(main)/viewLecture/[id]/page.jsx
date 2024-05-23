@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import ViewClassroom from '@/app/Teacher/view-classroom/[id]/page';
 
 const Viewlectures = () => {
   const { id } = useParams();
@@ -69,6 +70,9 @@ const Viewlectures = () => {
                   </div>
                 </div>
               </div>
+              <Link href={"/classroom"} className="w-full h-9 lg:w-fit group flex mb-3 items-center relative border rounded-[--btn-border-radius] *:select-none [&>*:not(.sr-only)]:relative before:rounded-[calc(var(--btn-border-radius)-1px)] before:absolute before:inset-0 before:border before:bg-gradient-to-b *:disabled:opacity-20 disabled:text-gray-950/40 disabled:border-gray-200 disabled:bg-gray-100 disabled:*:text-gray-300 disabled:before:border-transparent disabled:before:bg-gray-100 disabled:before:from-transparent dark:border-0 dark:before:border-0 dark:before:border-t dark:before:shadow-inner dark:disabled:border dark:disabled:border-gray-800/50 disabled:dark:bg-gray-900 disabled:dark:*:text-gray-700 dark:disabled:before:bg-gray-900 dark:disabled:before:from-gray-900 dark:disabled:before:shadow-none dar k:*:disabled:!text-white text-white border-gray-950 bg-gray-600 before:border-gray-600 before:from-gray-800 hover:bg-gray-900 active:bg-gray-950 dark:text-gray-950 dark:before:border-gray-200 dark:before:from-gray-200 dark:bg-white dark:before:shadow-white/10 dark:hover:bg-gray-100 dark:active:bg-gray-300 dark:active:before:from-gray-200 lg:text-sm lg:h-8 px-3 justify-center">
+                <span>Classroom</span>
+              </Link>
               <>
                 <div classname="  bg-gray-100">
                   <div classname="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -91,6 +95,7 @@ const Viewlectures = () => {
                                 alt="image"
                                 classname="h-full w-full object-cover object-center"
                               />
+                             
                             </div>
 
                           </div>
